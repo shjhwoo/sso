@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"sso/ldap"
 )
 
 type loginForm struct {
@@ -30,7 +31,11 @@ func loginHandler (rw http.ResponseWriter, req *http.Request) {
 	//1. 등록안된 기관번호를 입력한 경우
 	//2. 기관은 등록되어 있으나, 그 기관에 등록안된 아이디를 입력한 경우
 	//3. 기관과 아이디 모두 맞게 입력했는데 비밀번호가 틀린 경우
-	//4. 기관번호, 아이디, 비밀번호 모두 올바르게 입력한 경우
+	//4. 기관번호, 아이디, 비밀번호 모두 올바르게 입력한 경우: authorizationcode 발급
 
-	
+	//각 경우에 대해서 ldap 서버에 검색 요청을 보내야 한다. (LDAP은 디비다.)
+
+	ldapconn := ldap.DialAndBind()
+
+
 }
