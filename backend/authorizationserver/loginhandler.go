@@ -3,13 +3,17 @@ package authorizationserver
 import (
 	// "log"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
-	"sso/ldap"
+	ldapserver "sso/ldap"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type loginForm struct {
-	OrgId              string `json:"orgid"`
+	OrgId              string `json:"hospital_code"`
 	UserId             string `json:"userid"`
 	Password           string `json:"password"`
 }
@@ -26,16 +30,35 @@ func loginHandler (rw http.ResponseWriter, req *http.Request) {
 
 	var userinfo loginForm
 	json.Unmarshal(data, &userinfo)
-	//기관번호, 아이디, 비밀번호 입력 받아서 LDAP 서버에 저장된 정보와 비교하고, 
-	//올바른 정보를 제공하였을 시 authorzation code 또는  ID 토큰. 액세스 토큰, 리프레시 토큰을 제공함.
-	//1. 등록안된 기관번호를 입력한 경우
-	//2. 기관은 등록되어 있으나, 그 기관에 등록안된 아이디를 입력한 경우
-	//3. 기관과 아이디 모두 맞게 입력했는데 비밀번호가 틀린 경우
-	//4. 기관번호, 아이디, 비밀번호 모두 올바르게 입력한 경우: authorizationcode 발급
 
-	//각 경우에 대해서 ldap 서버에 검색 요청을 보내야 한다. (LDAP은 디비다.)
+	ldapconn, err := ldapserver.Connect()
 
-	ldapconn := ldap.DialAndBind()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	//병원코드
+	orgcode, err := ldapserver.Search(ldapconn,"ou=hospitals,dc=int,dc=trustnhope,dc=com","(&(objectClass=organizationalUnit)(ou="+ userinfo.OrgId +"))")
+	if err != nil {
+		fmt.Fprint(rw, "존재하지 않는 기관번호입니다")
+		return
+	}
+	fmt.Println(orgcode,"기관번호 확인")
+	//직원아이디
+	user, err := ldapserver.Search(ldapconn, "ou="+ userinfo.OrgId +",ou=hospitals,dc=int,dc=trustnhope,dc=com","(&(objectClass=inetOrgPerson)(uid="+ userinfo.UserId +"))" )
 
-
+	if err != nil {
+		fmt.Fprint(rw, "존재하지 않는 아이디입니다")
+		return
+	}else{
+		ldappw := user.Entries[0].GetAttributeValue("userPassword")
+		err := bcrypt.CompareHashAndPassword([]byte(ldappw),[]byte(userinfo.Password))
+		if err != nil {
+			fmt.Fprint(rw, "비밀번호가 올바르지 않습니다")
+			return
+		}
+		//로그인 성공. 
+		fmt.Println("로그인 성공했어용~")
+		//authorizationcode를 발급한다. (어디에 저장하지??: 디비에 저장해둔다. 그리고 일정 시간이 지나면 삭제해버렷)
+	}
 }

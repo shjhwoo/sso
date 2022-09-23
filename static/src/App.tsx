@@ -11,8 +11,8 @@ import axios from "axios";
 
 function App() {
   const [loginInfo, setLoginInfo] = useState({
-    hospitalCode: "",
-    userId: "",
+    hospital_code: "",
+    userid: "",
     password: "",
   });
 
@@ -35,15 +35,15 @@ function App() {
         <Input>
           <input
             placeholder="기관코드"
-            onChange={handleInputChange("hospitalCode")}
-            value={loginInfo.hospitalCode}
+            onChange={handleInputChange("hospital_code")}
+            value={loginInfo.hospital_code}
           ></input>
         </Input>
         <Input>
           <input
             placeholder="아이디"
-            onChange={handleInputChange("userId")}
-            value={loginInfo.userId}
+            onChange={handleInputChange("userid")}
+            value={loginInfo.userid}
           ></input>
         </Input>
         <Input>

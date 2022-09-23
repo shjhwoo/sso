@@ -9,7 +9,7 @@ import (
 const (
 	BindUsername = "CN=admin,DC=int,DC=trustnhope,DC=com"
 	BindPassword = "admin"
-	FQDN         = "118.67.131.11:3000" //"192.168.163.129:389" //"20.196.153.228:3389"
+	FQDN         = "118.67.131.11:3000" 
 )
 
 func DialAndBind(bindUsername string, bindPassword string) (l *ldap.Conn, err error) {
@@ -28,10 +28,10 @@ func DialAndBind(bindUsername string, bindPassword string) (l *ldap.Conn, err er
 }
 
 func Connect() (l *ldap.Conn, err error) {
-	l, err := DialAndBind(BindUsername, BindPassword)
+	lc, err := DialAndBind(BindUsername, BindPassword)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
 	}
-	return l, nil
+	return lc, nil
 }
