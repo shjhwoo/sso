@@ -9,7 +9,7 @@ import (
 	"github.com/rs/cors"
 )
 var corsHandler = cors.New(cors.Options{
-	AllowedOrigins:   []string{"http://localhost:8080","http://localhost:3000"},
+	AllowedOrigins:   []string{"http://localhost:3000","http://localhost:3006"},
 	AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
 	AllowedHeaders:   []string{"Origin", "Accept", "Content-Type", "X-Requested-With"},
 	AllowCredentials: true,
